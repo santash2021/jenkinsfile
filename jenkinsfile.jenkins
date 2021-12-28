@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('docker_version') {
+            steps {
+                sh 'docker version'
+                sh "echo $USER"
+            }
+        }
+        stage('git pull') {
+            steps {
+                git branch: 'develop',
+                    url: 'https://github.com/santash2021/Test.NetCore.WebApi.git'
+                dir('WebApi.Test'){
+                   dir('WebApi.Test'){
+                        sh 'docker build . -t 221192/ermek-dotnet'
+                        sh 'docker tag web-api 221192/ermek-dotnet:latest'
+                   }
+                }
+
+            }
+        }
+        stage('docker-push'){
+            steps{
+                withDockerRegistry(credentialsId: 'dotnet-docker-jenkins', url: 'https://index.docker.io/v1/'){
+                    sh 'docker push 221192/ermek-dotnet:latest'
+                }
+            }
+        }
+    }
+}
